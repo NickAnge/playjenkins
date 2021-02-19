@@ -1,2 +1,1 @@
-# playjenkins
-Jenkins Playground
+# jenkins-demo

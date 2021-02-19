@@ -1,46 +1,44 @@
 pipeline {
 
-  environment {
-    registry = "192.168.1.81:5000/justme/myweb"
-    dockerImage = ""
-  }
-
-  agent any
-
-  stages {
-
-    stage('Checkout Source') {
-      steps {
-        git 'https://github.com/justmeandopensource/playjenkins.git'
-      }
+    environment {
+        registry = "192.168.1.189:5000/nickange/myweb"
+        dockerImage = ""
     }
 
-    stage('Build image') {
-      steps{
-        script {
-          dockerImage = docker.build registry + ":$BUILD_NUMBER"
+    agent any
+
+    stages {
+
+        stage('Checkout Source') {
+            steps {
+                git "https://github.com/NickAnge/jenkins-demo.git"
+            }
         }
-      }
-    }
 
-    stage('Push Image') {
-      steps{
-        script {
-          docker.withRegistry( "" ) {
-            dockerImage.push()
-          }
+        stage('Build Image') {
+            steps{
+                script {
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
+                }
+            }
         }
-      }
-    }
 
-    stage('Deploy App') {
-      steps {
-        script {
-          kubernetesDeploy(configs: "myweb.yaml", kubeconfigId: "mykubeconfig")
+        stage("Push Image") {
+            steps{
+                script {
+                    docker.withRegistry( "" ) {
+                        dockerImage.push()
+                    }
+                }
+            }
         }
-      }
+        stage('Deploy App') {
+            steps {
+                script {
+                    kubernetesDeploy(configs: "myweb.yaml", kubeconfigId: "mykubeconfig")
+                }
+            }
+        }
+        
     }
-
-  }
-
 }
